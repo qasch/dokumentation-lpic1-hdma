@@ -21,3 +21,5 @@
 - Schreibe Programme so, dass sie zusammenarbeiten.
 - Schreibe Programme so, dass sie Textströme verarbeiten, denn das ist eine universelle Schnittstelle.
 - vereinfacht: Mache nur eine Sache und mache sie gut / KISS (Keep It Stupid Simple) Prinzip
+
+nur so zum Spass
