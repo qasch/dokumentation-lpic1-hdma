@@ -40,7 +40,43 @@ Textströme können mit Filterkommandos bearbeitet werden, so dass die Informati
 - `grep`: sucht nach einem Suchbegriff innerhalb von Dateien/Textströmen und gibt die entsprechende Zeile aus (`grep bash /etc/passwd`: gibt alle Zeilen aus, in denen der String `bash` vorkommt)
 - `tr`: übersetzt ein Zeichen in einem Textstrom (es können keine Dateien als Argument übergeben werden) in ein anderes/löscht dieses etc... (`tr a A < datei.txt`: wandelt jedes kleine `a` in ein grosses `A` um)
 - `tee`: verzweigt den Textstrom, so dass sowohl eine Ausgabe erfolgt, als auch in eine Datei geschrieben werden kann (`ls /etc | tee ls-etc.txt`)
-
-
-
 - `wc`: gibt die Anzahl der Zeilen, Wörter und Bytes einer Datei an (`wc -l /etc/passwd`: Anzahl Zeilen der Datei `/etc/passwd`)
+
+## Mittwoch, 16.03.2022
+
+### Kommandosubstitution
+- `$(kommando)`: `kommando` wird ausgeführt (in einer Subshell) und durch sein Ergebnis ersetzt: 
+  - Bsp.: Unterschied von `var=date` gegenüber `var=$(date)`:  
+  ``
+  var=date
+  echo $var
+  > date   # String/Zeichenkette date
+
+  var=$(date)
+  echo $var
+  > Thu 17 Mar 2022 08:48:09 AM CET  # aktuelles Datum
+  ``
+- ``kommdo``: ältere Syntax, sonst gleich wie oben
+- Konkretes AnwendungsbeispieL: Erstellung Backups mit aktuellem Datum im Dateinamen:
+``
+tar -cvzf backup-home-tux_$(date +%Y%m%d%M%H).tar.gz /home/tux 
+# Erzeugte Datei:
+backup-home-tux_202203161103.tar.gz
+``
+- Nested Command Substitution:
+`echo -e "Hallo, ich bin $(cut -d: -f5 /etc/passwd | grep -i $(whoami) | cut -d, -f1). \n \nHeute ist der $(date +'%F, %R Uhr'.)"`
+
+### echo
+- `echo -e`: so kann `echo` gewisse Steuerungszeichen interpretieren, um z.B. einen Zeilenumbruch zu erzeugen, einen horizontalen oder vertikalen Tabulator, ein Backspace etc.
+- diese Steuerungszeichen / Sequenzen beginnen mit einem `\` (Backslash)
+- `echo -e '\n'`: echo gibt eine (zusätzliche) Leerzeile aus (echo an sich führt bereits einen Zeilenumbruch am Ende der Ausgabe aus, so erhalten wir also zwei Leerzeilen) 
+- `\n` muss in diesem Fall _escaped_/_maskiert_/_gequotet_ werden, damit nicht die BASH, sondern das Kommando an sich (`echo`) den Backslash als Sonderzeichen interpretieren kann
+- der Backslash muss sozusagen vor der Shell "versteckt" werden
+- das Escapen kann sowohl durch Einfassen in einfache oder doppelete Anführungszeichen (`'` oder `"`) erfolgen, oder durch die Voranstellung eines Backslashs (`\`) (gilt für jedes Sonderzeichen wie z.B. `\`, `*`, `?` etc.): 
+``
+echo -e '\n'
+echo -e "\n"
+echo -e \\n
+``
+
+
