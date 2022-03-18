@@ -79,4 +79,23 @@ echo -e "\n"
 echo -e \\n
 ``
 
+## Donnerstag, 17.03.2022
 
+### Prozesse
+Ein Programm resultiert immer in mindestens einem Prozess. Prozesse laufen jeweils in einem von anderen unabhängigen "Resourcenraum", haben eine eigene PID, kennen nur die PID des Prozesses, von dem sie gestartet wurden. Prozesse können mit dem Kommando `kill` über sog. Signale beeinflusst werden.
+
+Auf der Shell kann immer nur ein einzelner Prozess im Vordergrund ausgeführt werden. Prozesse können mit der Tastenkomnination `STRG+Z` angehalten und in den Hintergrund geschickt werden.
+- `ps -aux`: Anzeige aller laufende Prozessez
+- `ps -ef`: auch Anzeige aller laufenden Prozesse
+- `ps --forest`: Prozesshirarchie (Baumstruktur) anzeigen
+- `jobs`: Anzeigen der Hintergrundprozesse
+- `jobs %<jobnummer>`: bestimmten Job ansprechen
+- `fg`: letzten/aktuellen/default Job in den Vordergrund holen
+- `fg %<jobnummer>`: Job mit Jobnummer <jobnummer> in den Vordergrund holen
+- `bg`: Hintergrundprozess fortsetzen
+- `kill`: sendet Siganle an Prozesse 
+- `kill -s <signal> <PID>`: sendet <siganl> an Prozess mit der PID <PID>
+- `kill -<signal> <PID>`: sendet <siganl> an Prozess mit der PID <PID>
+- `pkill`: analog zu oben, `pkill` erwartet aber den Namen bzw. einen Teil des Namesns eines Prozesses anstatt der PID
+- `killall`: wie oben, erwartet aber den exakten Prozessnamen
+- `pgrep`: PID laufender Prozesse ermitteln, ähnlich wie `ps -ef | grep`
