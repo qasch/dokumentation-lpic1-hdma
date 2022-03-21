@@ -99,3 +99,16 @@ Auf der Shell kann immer nur ein einzelner Prozess im Vordergrund ausgeführt we
 - `pkill`: analog zu oben, `pkill` erwartet aber den Namen bzw. einen Teil des Namesns eines Prozesses anstatt der PID
 - `killall`: wie oben, erwartet aber den exakten Prozessnamen
 - `pgrep`: PID laufender Prozesse ermitteln, ähnlich wie `ps -ef | grep`
+
+### Liste der Status
+- S, > I ...
+
+
+## Freitag, 18.03.2022
+
+- `nohup`: aufgerufener Prozess wird von der aufrufenden Shell gelöst, so dass dieser Prozess auch weiterläuft, wenn die aufrufenden Shell beendet wird
+- `nohup ping 1.1.1.1 > ping.out`: Ausgabe von `ping` in Datei `ping.out` umleiten
+- `tail -f`: fortlaufende Beobachtung einer Datei (neue Einträge werden automatisch angezeigt)
+- `top`: Anzeige laufender Prozesse, ähnlich zum Taskmanager unter Windows, Prozesse können auch interaktiv beeinflusst werden
+- `htop`: komfortablere Varinate von `top`
+- `screen, tmux`: *Terminalmulitpexer*, mehrere Shells können in einem Terminal gestartet werden, Fenster können auf bestimmte Arten angeordnet werden etc.
