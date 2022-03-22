@@ -112,3 +112,57 @@ Auf der Shell kann immer nur ein einzelner Prozess im Vordergrund ausgeführt we
 - `top`: Anzeige laufender Prozesse, ähnlich zum Taskmanager unter Windows, Prozesse können auch interaktiv beeinflusst werden
 - `htop`: komfortablere Varinate von `top`
 - `screen, tmux`: *Terminalmulitpexer*, mehrere Shells können in einem Terminal gestartet werden, Fenster können auf bestimmte Arten angeordnet werden etc.
+
+## Montag, 21.03.2022
+
+### Bootvorgang
+- Rechner anschalten
+- BIOS/UEFI wird gestartet (befindet sich auf CMOS)
+- POST (Power On Self Test): grundlegender Hardwaretest (welche ist vorhanden?)
+- im BIOS/UEFI eingestelltes Startmedium (Festplatte, USB, Netzwerk) bzw. die Konfiguration wird eingelesen 
+- Medium wird gestartet
+- Bootloader wird gestartet
+  - bei MBR partitionierten Platten (BIOS): 1. Teil des Bootloaders befindet sich in den ersten 440 Byte (restlichen 64 Byte sind die Partitionstabelle, Rest *Magic Number*)
+  - bei GPT partitionierten Platten (UEFI): auf der EFI-Partition (in der Regel z.B. 100 MB gross, FAT32 formatiert) vorhandene EFI-Applikation wird gestartet, diese startet dann den eignetlichen Bootloader
+  - GRUB2 kann sowohl MBR als auch GPT 
+  - UEFI liest den MBR nicht aus, benötig also eine GPT basierte Formatierung
+  - ein Feature von UEFI ist *Secure Boot*, wenn aktiviert, können nur *signierte*/vertrauenwürdige EFI-Applikationen gestartet werden (*TPM*), hierfür muss eine entsprechende Signatur/Schlüssel erworben/bereitgestellt werden
+  - sieht auch 
+    - https://www.windowspro.de/wolfgang-sommergut/faq-zu-uefi-bios-guid-partition-table-gpt-master-boot-record
+    - https://www.thomas-krenn.com/de/wiki/UEFI_Secure_Boot
+- Bootloader startet den Kernel
+- durch den Bootloader können dem Kernel bestimmte Startoptionen übergeben werden 
+  - entweder nur für diesen Bootvorgang durch Drücken der Taste `e` im GRUB Menu
+  - oder über die Datei `/boot/grub/grub.cfg`
+  - diese wird aber nicht direkt editiert, sondern ein *Template* unter `/etc/default/grub`
+  - anschliessend muss das Kommando `grub-mkconfig -o /boot/grub/grub.cfg` ausgeführt werden
+  - das Kommando `update-grub` ist ein Wrapperskript für obiges Kommando, kann alternativ genutzt werden
+- Kernel initialisiert Hardware, lädt Treiber etc. (-> *Kernelspace*)  
+- anschliessend startet der Kernel einen einzigen Prozess (mit der PID 1)
+- dies ist der Prozess `init` bzw. auf `systemd` basierten Systemen manchmal auch `systemd` genannt
+- dieser Prozess startet alle anderen für den Betrieb notwendigen Prozesse
+
+### SysV-Init
+- altes Init-System, Vorgänger von Systemd
+- Prozesse werden sequentiell, also nacheinander gestartet
+- Konfiguration dieser Vorgänge über Shell-Skripte
+- diese liegen unter `/etc/init.d`
+
+#### Runlevel
+- Betriebszustände in denen sich das System befinden kann
+- werden beim Bootvorgang durchlaufen
+- es gibt die Runlevel 1 bis 6
+- Runlevel werden in der Datei `/etc/inittab` definiert
+  - Runlevel 0: Computer ausschalten
+  - Runlevel 1: Single User Mode / Rescue Mode (vergleichbar mit dem Abgesicherten Modus)
+  - Runlevel 2: Multi User Mode
+  - Runlevel 3: zusätzlich Netzerk
+  - Runlevel 4: nicht genutzt
+  - Runlevel 5: zusätzlich grafische Oberfläche
+  - Runlevel 6: Reboot
+- Definition ist nicht starr, kann angepasst werden
+- hier wird aussedem der Default Runlevel gesetzt und das Verhalten der Tastenkombination `STRG+ALT+ENTF` eingestellt
+- in den Verzeichnissen `/etc/rc0.d` bis `/etc/rc6.d` liegen Symlinks auf Skripte, die Dienste starten bzw. stoppen
+- Skripte/Dienste mit einem `S` am Anfang werden beim Betreten des Runlevel gestartet, solche mit einem `K` entsprechend gestoppt, Reihenfolge über Zahlen hinter `S` oder `K`
+
+
