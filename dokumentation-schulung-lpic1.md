@@ -122,7 +122,7 @@ Auf der Shell kann immer nur ein einzelner Prozess im Vordergrund ausgeführt we
 - im BIOS/UEFI eingestelltes Startmedium (Festplatte, USB, Netzwerk) bzw. die Konfiguration wird eingelesen 
 - Medium wird gestartet
 - Bootloader wird gestartet
-  - bei MBR partitionierten Platten (BIOS): 1. Teil des Bootloaders befindet sich in den ersten 440 Byte (restlichen 64 Byte sind die Partitionstabelle, Rest *Magic Number*)
+  - bei MBR partitionierten Platten (BIOS): 1. Teil des Bootloaders befindet sich in den ersten 440 Byte bzw. 446 Byte. Die 6 Byte werden z.B. von Windows zur Datenträgersignatur verwendet. Es folgen 64 Byte mit der Partitionstabelle, die letzten 2 Byte sind die *Magic Number* bzw. der Bootflag)
   - bei GPT partitionierten Platten (UEFI): auf der EFI-Partition (in der Regel z.B. 100 MB gross, FAT32 formatiert) vorhandene EFI-Applikation wird gestartet, diese startet dann den eignetlichen Bootloader
   - GRUB2 kann sowohl MBR als auch GPT 
   - UEFI liest den MBR nicht aus, benötig also eine GPT basierte Formatierung
