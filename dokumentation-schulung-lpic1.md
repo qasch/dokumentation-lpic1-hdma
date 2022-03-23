@@ -147,7 +147,9 @@ Auf der Shell kann immer nur ein einzelner Prozess im Vordergrund ausgeführt we
 - Prozesse werden sequentiell, also nacheinander gestartet
 - Konfiguration dieser Vorgänge über Shell-Skripte
 - diese liegen unter `/etc/init.d`
-
+- Rechner herunterfahren mittels: `shutdown -h +5 "Rechner wird in 5 Minuten heruntergefahren"
+  - `shutdown` führt zusätzlich das Kommando `wall` aus, um die Nachricht an alle angemeldeten Benutzer zu senden
+  - `shutdown -c` bricht den aktuellen shutdown ab
 #### Runlevel
 - Betriebszustände in denen sich das System befinden kann
 - werden beim Bootvorgang durchlaufen
@@ -165,4 +167,33 @@ Auf der Shell kann immer nur ein einzelner Prozess im Vordergrund ausgeführt we
 - in den Verzeichnissen `/etc/rc0.d` bis `/etc/rc6.d` liegen Symlinks auf Skripte, die Dienste starten bzw. stoppen
 - Skripte/Dienste mit einem `S` am Anfang werden beim Betreten des Runlevel gestartet, solche mit einem `K` entsprechend gestoppt, Reihenfolge über Zahlen hinter `S` oder `K`
 
+## Dienstag, 22.03.2022
+
+### systemd
+- Servicemanager und Initialisierungssystem
+- Nachfolger von SysV-Init
+- Services können parallel gestartet werden (beim Bootvorgang)
+- Abhängigkeiten zu anderen Diensten können definiert und aufgelöst werden (ein Service braucht einen bestimmten anderen Service, um laufen zu können)
+- Enstsprechung von Runlevel sind hier die *targets*
+  - Runlevel 1 <=> `rescue.target`
+- Entsprechung der Shellskripe sind hier die Unitfiles
+- Services, Targets etc. werdedn Units genannt
+- `systemctl poweroff / reboot / suspend / hibernate` Rechner ausschalten, neu starten ...
+
+### Benutzerverwaltung
+- Systembenutzer - Reale Benutzer
+- `useradd -m -c "Tux Tuxedo" -s /bin/bash tux`
+
+#### Benutzer wechseln
+- `su tux`: Wechselt in den Benutzeraccount von `tux`, Umgegung (`env`, Variablen etc.) werden teilweise neu gesetzt
+- `su - tux`: wie oben, es werden aber alle Umgebungsvariablen neu gesetzt ("echte" Login Shell)
+- `su -l tux`: wie oben
+- `su --login tux`: wie oben
+
+### chage
+- Gültigkeitsdauer etc. von Passwörtern regeln
+
+### Gruppen
+- initiale Gruppe des Benutzers ändern: `usermod -g users tux`
+- User zusätzlichen Gruppen hinzufügen: `usermod -aG sudo,adm,cdrom tux`
 
