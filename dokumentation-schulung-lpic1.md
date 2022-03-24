@@ -197,3 +197,119 @@ Auf der Shell kann immer nur ein einzelner Prozess im Vordergrund ausgeführt we
 - initiale Gruppe des Benutzers ändern: `usermod -g users tux`
 - User zusätzlichen Gruppen hinzufügen: `usermod -aG sudo,adm,cdrom tux`
 
+## Mittwoch, 23.03.2022
+
+### Berechtigungen
+
+## Rechte
+### reguläre Dateien
+r = read    -> Dateiinhalt lesen
+w = write   -> Dateiinhalt schreiben
+x = execute -> Dateien ausführen
+
+### Verzeichnisse
+r = read    -> Verzeichnisinhalt lesen
+w = write   -> Dateien erstellen oder loeschen
+x = execute -> Verzeichnis betreten/hineinwechseln
+
+Filedescriptor Owner Group Others
+                u      g    o
+-	       rwx   rwx   rwx
+
+## Anzeige von `ls -l`
+
+``
+-rw-r--r-- 1 kai kai     59 Mar 16 15:05 anzahl-user.txt
+-rw-r--r-- 1 kai kai     44 Mar 23 09:23 berechtigungen.txt
+-rw-r--r-- 1 kai kai     20 Mar 15 11:43 cat_ausgabe.txt
+drwxr-xr-x 3 kai kai   4096 Mar 23 09:20 dokumentation
+
+SP  User Group Others Inodes User Group Dateigrösse Änderungsdatum Dateiname
+-   rw-  r--   r--    1      kai  kai   59          Mar 16 15:05   anzahl-user.txt
+``
+
+- SP: Special Designator: gibt die Art der Datei an
+- alle Verzeichnisse werden mit einer Grösse von 4096 Byte angegeben
+
+## Berechtigungen vergeben
+
+### Symbolische Rechtevergabe
+- einzelen Berechtigungen können hinzugefügt, entfernt oder gesetzt werden
+``
+# (< und > sind Platzhalter)
+## allgemeine Form
+chmod <user,group,other,all>+-=<read,write,execute> datei
+chmod <u,g,o,a>+-=<r,w,x> datei
+
+## konkrete Beispiele
+chmod u+w datei    # Schreibrecht für Besitzer hinzufügen
+chmod g-rw datei   # Gruppe Lese- und Schreibrecht entziehen
+chmod ugo=rwx datei  # User, Gruppe und Others alle Rechte setzen
+
+chmod o-w -R verz/  # Others rekursiv Schreibrechte entziehen (in allen Dateien und Unterverzeichnissen)
+``
+
+### Oktale Rechtevergabe
+
+- `r` lesen:     `4`
+- `w` schreiben: `2`
+- `x` ausführen: `1`
+
+``
+Okt Bin
+ 1  001   x 
+ 2  010   w
+ 3  011
+ 4  100   r
+ 5  101
+ 6  110
+ 7  111
+
+ 110 110 100
+-rw- rw- r-- 1 kai kai 0 Mar 23 09:58 datei1
+
+``
+
+``
+      ugo
+chmod 755 datei
+``
+
+## Sonderbits
+
+- SUID: Auf eine ausführbare Binärdatei gesetzt, wird diese Datei mit den Rechten des Besitzers der Datei ausgeführt und nicht mit den Rechten des aufrufenden Benutzers.
+-`-rws r-x r-x 1 root root 43 Mar 23 09:58 /usr/bin/passwd`  (SUID Bit und Execute Bit sind gesetzt)
+-`-rwS r-x r-x 1 root root 43 Mar 23 09:58 /usr/bin/passwd`  (SUID Bit gesetzt, Execute Bit nicht gesetzt)
+- SGID: Auf eine ausführbare Binärdatei gesetzt, wird diese mit den Rechten der Gruppe der Datei ausgeführt, auf ein Verzeichnis gesetzt, werden alle neu darin erstellten Dateien automatisch der Gruppe des Verzeichnisses zugeordnet
+-`-rwx rws r-x 1 root users 43 Mar 23 09:58 /var/users`  (SGID Bit und Execute Bit sind gesetzt)
+- StickyBit: Auf ein Verzeihnis gesetzt, können nur noch der Besitzer der Datei oder root die Datei verändern oder löschen, auch wenn ansonsten Schreibrechte für alle bestehen (`/tmp`):
+- `drwxrwxrwt 10 root root 4096 Mar 24 09:08 /tmp`
+
+## umask
+Legt fest, mit welchen Berechtigungen neu erstellen Dateien und Verzeichnisse versehen werden.
+
+Die in der `umask` gesetzten Berechtigungen werden in neu erstellen Dateien und Verzeichnissen **nicht** gesetzt. Vollberechtigungen für Dateien unter Linux sind `666` (Dateien dürfen nicht mit Ausführungsrechten erstellt werden), für Verzeichnisse sind das `777`.
+
+siehe auch https://wiki.archlinux.org/title/Umask
+
+``
+Vollberechtigungen      0666   0777
+
+umask   		Datei  Verzeichnis
+
+0022 			0644 , 0755
+
+0023 			0644 , 0754
+``
+
+Die umask kann mit dem Kommando `umask <mode>`, also z.B. `umask 0022` gesetzt werden. Diese gilt dann für die aktuelle Shell und alle Subshells. Andere bereits geöffnete Shells behalten die vorher gesetzte `umask` bei.
+
+Eine Datei um die `umask` zu setzten wäre z.B. `.profile` oder `.bashrc` etc.
+
+
+
+
+
+
+
+
