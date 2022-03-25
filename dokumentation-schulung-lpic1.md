@@ -321,13 +321,18 @@ Eine Datei um die `umask` zu setzten wäre z.B. `.profile` oder `.bashrc` etc.
 - `/media`: auto-mounting place for certain external devices on some distros
 - `/mnt`: place to mount various file systems
 - `/opt`: various software, not installed by package manager
-- `/proc`: virtual filesystem (`procfs`) for resources, processes, and more
+- `/proc`: virtual filesystem (`procfs`) for resources, processes, and more, only in memory, not actula files on hard disk
 - `/root`: root user home directory
 - `/sbin`: similar to `/bin`, but for system administrators, ex. `fdisk`
 - `/tmp`: temporary file storage, wiped out after reboot
 - `/usr`: user programs, library files, docs, etc.
 - `/var`: variable files for various purposes, ex. logs, tz data, files for webserver (debian)
 - `/vmlinuz`: boot/vmlinuz-4.15.0-43-generic: compressed linux kernel 
+
+#### weitere wichtige Verzeichnisse (nicht Bestandteil des FHS)
+- `/sys`: virtual filesystem (`sysfs`), extension to `/proc`
+- `/run`: virtual filesystem, was under `/var/run` (symlinked) before, applications can store data needed to operate, e.g. `.lock` files
+
 
 ### Relative und absolute Pfade
 
