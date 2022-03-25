@@ -306,10 +306,61 @@ Die umask kann mit dem Kommando `umask <mode>`, also z.B. `umask 0022` gesetzt w
 
 Eine Datei um die `umask` zu setzten wäre z.B. `.profile` oder `.bashrc` etc.
 
+## Donnerstag, 24.03.2022
 
+### Filesystem Hierarchy Standard - FHS
+- `/bin`: common executables available for everyone, `ex. cp rm ls`
+- `/boot`: kernel and boot configuration, initial ramdisk
+- `/dev`: files which point to both physical and pseudo devices, populated by `udev`
+- `/etc`: system and program configuration files
+- `/home`: non-root user home directories
+- `/lib`
+- `/lib32`
+- `/lib64`: library files used by the system, include `.so` files and others
+- `/lost+found`: saved files due to failure, not relevant for users, just for the system
+- `/media`: auto-mounting place for certain external devices on some distros
+- `/mnt`: place to mount various file systems
+- `/opt`: various software, not installed by package manager
+- `/proc`: virtual filesystem (`procfs`) for resources, processes, and more
+- `/root`: root user home directory
+- `/sbin`: similar to `/bin`, but for system administrators, ex. `fdisk`
+- `/tmp`: temporary file storage, wiped out after reboot
+- `/usr`: user programs, library files, docs, etc.
+- `/var`: variable files for various purposes, ex. logs, tz data, files for webserver (debian)
+- `/vmlinuz`: boot/vmlinuz-4.15.0-43-generic: compressed linux kernel 
 
+### Relative und absolute Pfade
 
+- ein **relativer Pfad** geht immer vom aktuellen Verzeichnis aus in dem sich der Benutzer befindet
+- ein **absoluter Pfad** geht immer Wurzelverzeichnis `/` aus
 
+### Symlinks und Hardlinks
 
+#### Symlinks, Symbolische Links, Softlinks, (Verknüpfungen uner Windows)
 
+- Verweis auf eine andere Datei
+- `ln -s <source> <link-name>`
+- `ln -s ~/original/datei1 ~/links/symlink-auf-datei1`
+- `ln -s ~/original/datei1 ~/links/`: Link erhält den geichen Namen wie die Originaldatei
+- `ln -s ~/original/datei1 .`: erstellt einen Link mit Namen `datei1` im aktuellen Verzeichnis
+- wird die Originaldatei gelöscht, erhalten wir einen sog. "toten Link" oder "verwaisten Link", der Link zeigt also nirgendwo hin
+- sowohl für die Quellen als auch für die Links können sowohl relative als auch absolute Pfadangaben verwendet werden
+- je nach Anwendungsfall ist die eine oder die andere Lösung zielführender
+- Symlinks sind immer mit vollen Berechtigungen versehen (`0777`), versucht man, die Berechtigungen eines Symlinks zu ändern, so ändert man anstatt dessen die Berechtigungen des Originals
+- Symlinks sind eine Art "Tunnel" oder "Zeiger" auf das Original
+- bei der Ausgabe von `ls -l` ist der Symlink als solcher zu erkennen (`symlink -> ../originaldatei`)
 
+#### Hardlinks
+
+- Hardlinks sind ein Verweis auf den selben Speicherbereich des Originals
+- Hardlinks könnten also als ein weiterer Dateiname auf die selbe Datei angesehen werden
+- von Aussen ist kein Unterschied zwischen "Original" und Hardlink zu erkennen
+- ein Dateiname ist im Prinzip bereits ein Hardlink
+- können im Gegensatz zu Softlinks nicht auf Verzeichnisse oder partitionsübergreifend angewandt werden
+- Prüfung, ob es weieter Hardlinks auf eine Datei gibt mit dem Kommando `stat` oder bei `ls -l` die Spalte zwischen Berechtigungen und dem Bestizer der Datei
+
+## die drei "Roots" unter Linux
+
+- `root` - Superuser
+- `/` (root) - Wurzel des Dateisystembaums
+- `/root` - Heimatverzeichnis vom Benutzer `root`
