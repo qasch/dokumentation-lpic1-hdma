@@ -369,3 +369,116 @@ Eine Datei um die `umask` zu setzten wäre z.B. `.profile` oder `.bashrc` etc.
 - `root` - Superuser
 - `/` (root) - Wurzel des Dateisystembaums
 - `/root` - Heimatverzeichnis vom Benutzer `root`
+
+## Freitag, 25.03.2022 und Montag, 28.03.2022
+
+### Partitionierung
+- damit ein Massenspeichergerät (Festplatte, USB-Stickt ...) genutzt werden kann, muss darauf mindestens eine Partition erzeugt werden
+- zusätzlich muss auf dieser Partition ein Dateisystem erzeugt werden (Formatierung)
+- `fdisk`: urpsrünglich nur für MBR, kann mittlerweile auch GPT, interaktive Benutzung
+  - `fdisk -l`: Anzeige der Partitionstabelle bzw. Informationen über das Speichergerät
+  - `fdisk /dev/sdc`: Wichtig: hier wird die *Platte* angegeben und nicht eine Partition
+- `gdisk`: für GPT entwickelt, Bedienung etc. fast identich mit `fdisk`
+- `parted`: kann GPT und MBR, bestimmte Parameter können im Nachhinein ohne Datenverlust geändert werden, im Gegensatz zu `fdisk` und `gdisk` werden Änderungen sofort und nicht erst nach dem Speichern mit `w` durchgeführt
+- `gparted`: Grafisches Frontend aus dem *GNOME* Desktop
+- `KDE Partition Manager`: Grafisches Frontend aus dem *KDE* Desktop
+- Anzeige über Geräte, Partitionen, Dateisysteme,UUIDs, Labels etc mit:
+  - `lsblk -fs`
+  - `lsblk -o +UUID`: zusätzlich nur die UUIDs
+
+### Formatierung
+- ohne Dateisystem kann die Partition nicht benutzt, bzw. nicht in den Dateisystembaum eingebunden werden
+- `mkfs -t <type> <partition>
+- `mkfs.<type> <partition>
+- `mkfs -t ext4 /dev/sdc1`
+- `mkfs.ext4 /dev/sdc1`
+- `mke2fs`
+
+### Dateisysteme
+- `ext2`: ursprünglich das Standarddateisystem unter Linux
+- `ext3`: identisch mit `ext2`, hat nur zusätzlich ein *Journal* (Wiederherstellungsinformationen)
+- `ext4`: Weiterentwicklung von `ext3`
+- `xfs`: High Performance Dateisystem, hat auch ein Journal, mittlerweile Standard unter RedHat, zur Benutzung muss unter Debian das Paket `xfsprogs` installiert werden
+- `btrfs`: modernes Dateisystem mit vielen Funtionen (Subolumes, Snapshots, Kompression, Inkrementelle Backups, optimiert für SSDS..., *Copy On Write*, daher geringe Gefahr des Datenverlustes
+  - `btrfs subvolume create /mnt/mysubvol`: Subvolume erstellen
+  - `btrfs subvolume list /mnt`: Subvolumes auf `/mnt` anzeigen
+  - `btrfs subvolume show /mnt/mysubvol/`: Informationen über das Subvolume
+  - `mount -t btrfs -o subvol=mysubvol /dev/vda5 /mnt/SUBVOL`: Subvolumen mounten
+  - `btrfs subvolume snapshot /mnt/SUBVOL/ /mnt/subvol-snapshot`: Snapshot erstellen
+  - `btrfs subvolume snapshot -r /mnt/SUBVOL/ /mnt/subvol-snapshot`: ReadOnlu Snapshot erstellen
+  - Snapshots belegen nur initial fast keinen Speicherplatz, erst wenn es Änderungen zwichen Original und Snapshot gibt, belegen diese Änderungen Speicherplatz
+- `FAT16`: Volume auf 4 GB beschränkt, Dateigrösse auf 2 GB
+- `VFAT`: Erweiterung von FAT16, unterstützt Dateinamen bis zu einer Länge von 255 Zeichen)
+- `FAT32`: Volume max. 2PB, Dateigrösse max. 4 GB 
+  - `mkfs.fat /dev/sdc1`
+  - `mkfs.vfat /dev/sdc1`: identisch zu oben
+- `exFAT`: Volume 128 PB, Dateigrösse max. 16 Exibyte (EiB), wird gerne für USB Sticks verwendet, kann von jedem OS genutzt werden
+  - `mkfs.exfat <partition>
+
+#### Swap
+- Auslagerungsdatei/-partition
+- kann eine eigenständige Partition sein (vom Typ `swap / 82`)
+  - `mkswap /dev/sdb4`
+  - `swapon /dev/sdb4`
+- aber auch eine einzelne Datei
+  - `dd if=/dev/zero of=/swapfile bs=1024M count=10`
+  - `mkswap /swapfile`
+  - `swapon -v /swapfile`
+- es können theoretisch gleichzeitig mehere Swap Partitionen und Dateien genutzt werden
+- Prüfung swap mit `cat /proc/swaps`
+
+### Mounten
+- Mounten bezeichnet das Einbinden einer mit einem Dateisystem versehenen Partition in den Dateisystembaum
+- man verbindet also die Gerätedatei (z.B. `/dev/sdb1`) mit einem beliebigen existierenden Verzeichnis
+- `mount -t <dateisystem> <gerätedatei> <einhängepunkt>`
+- `mount <gerätedatei> <einhängepunkt>`
+- `mount /dev/sdb1 /mnt`
+- Mount bleibt bis zum Reboot oder manuellem Aushängen bestehen
+
+#### fstab
+- hier können statische Mounts konfiguriert werden
+- Geräte können über Gerätedatei, UUID oder LABEL angesprochen werden
+- die angegebenen Optionen werden in der angegebenen Reihenfolge bearbeitet, einzelne Optionen könen so überschrieben werden: `defaults,noauto,user`
+- Achtung bei diesen Optionen (auf aktuellen Systemen kein `users` mehr)
+- `user`	Der aktuelle Benutzer kann die Partition einhängen und nur er kann sie auch wieder aushängen.
+- `users` 	Jeder Benutzer kann die Partition einhängen und jeder Benutzer darf sie wieder aushängen.
+- `nouser`	Nur mit Root-Rechten kann die Partition ein und ausgehängt werden (Standardoption in defaults).
+- `auto`: wird beim Systemstart bzw. mit dem Kommando `mount -a` gemountet
+- Zeilen mit Syntaxfehler werden einfach ignoriert
+
+### find
+- Suche nach Dateien, Verzeichnissen etc. auf Dateisystemebene
+- die Suche kann sehr fein eingestellt werden
+- Suchkriterien werden in der Manpage *TESTS* genannt
+- es gibt Tests für z.B.:
+  - Dateien
+  - Verzeichnisse
+  - Benutzer
+  - Berechtigungen
+  - Alter/Zugriffszeit
+  - Grösse
+  - etc.
+- Optionen werden in der Langschreibweise mit nur einem einzelnen Minuszeichen angegeben (UNIX Syntax)
+- es können beliebig viele Tests kombiniert werden um die Suche zu verfeinern
+  - `find / -name "*.jpg" -type f -amin +5` (sucht im gesamten Dateisystem nach allen regulären Dateien mit der Endung `.jpg` auf die vor mehr als 5 Minuten zugegriffen wurde)
+- mit der Option `-exec` können Kommandos auf die einzelnen Suchergebnisse angewandt werden
+  - `find / -type f -size +50G -user tux -exec rm {} \;` (löscht alle regulären Dateien, die grösser als 50G sind und dem Benutzer `tux` gehören
+  - `find / -type f -size +50G -user tux -delete` (löscht alle regulären Dateien, die grösser als 50G sind und dem Benutzer `tux` gehören
+
+### locate
+- kann auch nach Dateien suchen
+- nutzt eine Datenbank zur Suche, ist daher sehr schnell
+- die Datenbank kann manuell mit dem Kommando `updatedb` (mit Root Rechten) aktualisiert werden
+- dies wird auch automatisch von einem `cronjob` erledigt
+- Vorsicht mit neu erstellten oder kürzlich gelöschten Dateien (Datenbank vorher manuell aktualisieren)
+
+
+
+
+
+
+
+
+
+
+
