@@ -472,8 +472,51 @@ Eine Datei um die `umask` zu setzten wäre z.B. `.profile` oder `.bashrc` etc.
 - dies wird auch automatisch von einem `cronjob` erledigt
 - Vorsicht mit neu erstellten oder kürzlich gelöschten Dateien (Datenbank vorher manuell aktualisieren)
 
+## Paketverwaltung
+- APT: Advanced Packaging Tool
+- Frontend für `dpkg`, nutzt `dpkg` im Hintergrund
+- Pakete können im Gegensatz zu `dpkg` auch über das Internet heruntergeladen werden, Abhängigkeiten werden automatisch aufgelöst
+- Repositories werden in der Datei `/etc/apt/sources.list` eingetragen bzw. in Dateien unterhalb von `/etc/apt/sources.list.d`
+- Components (`main`, `non-free`, `security` ...)
+- Release Modell (Versionsbasiert)
+- (experimental -> ) unstable -> testing -> stable
+  - Lebenszyklus eines Debian Pakets: https://debian-handbook.info/browse/de-DE/stable/sect.release-lifecycle.html
+- Rolling Release (Arch, CentosStream): keine Versionen, immer neueste Software
+- `apt-get`: Installation, Deinstallation etc.
+- `apt-cache`: Informationen über Pakete
+- `apt-file`: Suche (über Internet/Paketquellen) nach Paket, das bestimmte Datei bereitstellt
+- `apt-get install -f`: "Repariert" unaufgelöste Abhängigkeiten
+- `apt install --fix-broken`: "Repariert" unaufgelöste Abhängigkeiten
+- `apt-get autoremove`: Entfernt nicht mehr benötigte automatisch installierte Pakete
+- `apt-get upgrade`: Upgrade aller auf dem System installierten Pakete, unter keinen Umständen werden neue Pakete installiert oder bereits vorhandene gelöscht (in Folge von Auflösung von Abhängigkeiten)
+- `apt-get dist-upgrade`: installiert/entfernt ggf. Pakete (näheres siehe Manpage)
 
-
+### dpkg
+- kann nur mit lokal vorhandenen Dateien arbeiten
+- Abhängigkeiten werden erkannt, können aber nicht automatisch aufgelöst werden (muss vom Benutzer selbst übernommen werden)
+- dpkg -i <dateiname>.deb
+- dpkg --install <dateiname>.deb
+- dpkg -I <paketname>
+- dpkg -r <paketname>  (Konfigurationsdateien bleiben erhalten)
+- dpkg --remove <paketname>
+- dpkg -P <paketname> (Konfigurationsdateien werden gelöscht)
+- dpkg --purge <paketname>
+- dpkg -C: Consitency Check
+- dpkg --audit: Consitency Check
+- dpkg-deb:
+  - dpkg -c  <archive>: Inhalt des `.deb` Archivs
+  - dpkg -I <paketname>
+  - dpkg --info <paketname>
+- dpkg-query:
+  - dpkg -l  (Anzeige aller auf dem System installierter Pakete)
+  - dpkg-query -l <pattern>, z.B. `dpkg -l "apache*"
+  - dpkg --list
+  - dpkg -L <paketname> (Liste der im Paket enthaltenen Dateien)
+  - dpkg --listfiles <paketname>
+  - dpkg-query -S <dateiname-suchmuster>: zu welchem Paket gehört die angegebene Datei 
+  - dpkg --search
+  - dpkg --status <paketname>: detaillierte Informationen über Paket
+  - dpkg -s  <paketname>
 
 
 
